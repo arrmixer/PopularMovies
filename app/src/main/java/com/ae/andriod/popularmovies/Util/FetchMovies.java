@@ -27,7 +27,7 @@ public class FetchMovies {
 
 
     //key
-    private static final String API_KEY = "17c93fa89aa99cc84adb1679779d010f";
+    private static final String API_KEY = "add your key";
 
     //Constants for URI
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
@@ -92,7 +92,7 @@ public class FetchMovies {
             connection.disconnect();
         }
     }
-
+    //TODO need to document properly
     /**/
     public static ArrayList<Movie> parseSandwichJson() {
 

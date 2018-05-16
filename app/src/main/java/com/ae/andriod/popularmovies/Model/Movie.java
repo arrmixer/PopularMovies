@@ -1,29 +1,29 @@
 package com.ae.andriod.popularmovies.Model;
 
-import android.graphics.Bitmap;
-import android.media.Image;
-import android.net.Uri;
 
-import java.net.URI;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+
 
 /*Model for the Movie object(POJO). It should populate on
  * the UI the movie title, Image of Movie Poster,
  * plot synopsis, user rating, and release date. */
-public class Movie {
+public class Movie implements Parcelable{
     //only part of Movie object not shown to user
-    int movieId;
+    private int movieId;
 
     /*All properties from JSON to be shown to user
      * on the details page in another activity*/
-    String mTitle;
-    double mUserRating;
-    String mReleaseDate;
-    String mDescription;
+   private String mTitle;
+   private double mUserRating;
+   private String mReleaseDate;
+   private String mDescription;
 
 
     /*Stores image path of poster to be
      * shown on main grid page*/
-    String mPoster;
+    private String mPoster;
 
     //Constant for URL
     private static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
@@ -105,4 +105,40 @@ public class Movie {
                 '}';
     }
 
+    /*Parcel section*/
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    private Movie(Parcel in){
+        this.movieId = in.readInt();
+        mTitle = in.readString();
+        mPoster = in.readString();
+        mUserRating = in.readDouble();
+        mReleaseDate = in.readString();
+        mDescription = in.readString();
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int i) {
+        dest.writeInt(this.movieId);
+        dest.writeString(this.mTitle);
+        dest.writeString(this.mPoster);
+        dest.writeDouble(this.mUserRating);
+        dest.writeString(this.mReleaseDate);
+        dest.writeString(this.mDescription);
+    }
 }

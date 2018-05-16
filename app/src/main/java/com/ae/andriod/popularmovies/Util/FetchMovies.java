@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /*Util class used to open HTTP connection and Parse
@@ -25,22 +24,17 @@ public class FetchMovies {
     private static final String TAG = FetchMovies.class.getSimpleName();
 
 
-
     //key
-    private static final String API_KEY = "add your key";
+    private static final String API_KEY = "17c93fa89aa99cc84adb1679779d010f";
 
     //Constants for URI
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    private static final String POPULAR = "popular"; //for popular search
+
 
 
     //API Uri converted to a string
-    private static final String ENDPOINT = Uri
-            .parse(BASE_URL)
-            .buildUpon()
-            .appendPath(POPULAR)
-            .appendQueryParameter("api_key", API_KEY)
-            .build().toString();
+    private static final Uri ENDPOINT = Uri
+            .parse(BASE_URL);
 
 
     //JSON fields
@@ -57,14 +51,19 @@ public class FetchMovies {
      * over using the scanner with a useDelimiter("\\A") trick. This method takes
      * the output from the ByteArrayOutputStream and converts it to a String
      *
-     * @param urlSpec String of URL
+     * @param String query to get specific search API
      *
      * @return String conversion of byte[] from output stream
      *
      * @throws IOException if connection cannot be established */
-    public static byte[] getUrlBytes() throws IOException {
+    private static byte[] getUrlBytes(String query) throws IOException {
 
-        URL url = new URL(ENDPOINT);
+        String stringUrl = ENDPOINT
+                .buildUpon()
+            .appendPath(query)
+                .appendQueryParameter("api_key", API_KEY)
+                .build().toString();
+        URL url = new URL(stringUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         try {
@@ -92,16 +91,17 @@ public class FetchMovies {
             connection.disconnect();
         }
     }
+
     //TODO need to document properly
     /**/
-    public static ArrayList<Movie> parseSandwichJson() {
+    public static ArrayList<Movie> parseSandwichJson(String query) {
 
         //Data Structure to hold the Movie objects
         ArrayList<Movie> movies = new ArrayList<>();
 
         try {
 
-            String json = new String(FetchMovies.getUrlBytes());
+            String json = new String(FetchMovies.getUrlBytes(query));
 
             /* place holders for all the fields within the Movie class */
             int movieID;
@@ -132,15 +132,12 @@ public class FetchMovies {
             return movies;
         } catch (IOException ie) {
             Log.e(TAG, "Failed to fetch items: -----------------", ie);
-        }catch (JSONException je) {
+        } catch (JSONException je) {
             Log.e(TAG, "Failed to parse JSON", je);
         }
 
         return movies;
     }
-
-
-
 
 
 }

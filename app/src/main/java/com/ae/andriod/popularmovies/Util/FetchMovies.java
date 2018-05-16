@@ -25,7 +25,7 @@ public class FetchMovies {
 
 
     //key
-    private static final String API_KEY = "17c93fa89aa99cc84adb1679779d010f";
+    private static final String API_KEY = "place your key here";
 
     //Constants for URI
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";

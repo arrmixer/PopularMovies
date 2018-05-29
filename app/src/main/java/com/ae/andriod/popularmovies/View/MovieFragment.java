@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Toast;
 
 
@@ -278,16 +279,15 @@ public class MovieFragment extends Fragment {
                 if (!query.equals(TOP_RATED)) {
                     new FetchMoviesTask().execute(TOP_RATED);
                 } else {
-                    Toast.makeText(getActivity(), "List already processed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_LONG).show();
                 }
-
-
+                
                 return true;
             case R.id.most_popular:
                 if (!query.equals(POPULAR)) {
                     new FetchMoviesTask().execute(POPULAR);
                 } else {
-                    Toast.makeText(getActivity(), "List already processed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_LONG).show();
                 }
 
                 return true;

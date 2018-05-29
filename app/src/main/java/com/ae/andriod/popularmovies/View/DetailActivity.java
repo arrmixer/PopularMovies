@@ -31,5 +31,6 @@ public class DetailActivity extends SingleFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+
     }
 }

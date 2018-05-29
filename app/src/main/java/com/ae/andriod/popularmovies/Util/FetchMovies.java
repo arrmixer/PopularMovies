@@ -3,6 +3,7 @@ package com.ae.andriod.popularmovies.Util;
 import android.net.Uri;
 import android.util.Log;
 
+import com.ae.andriod.popularmovies.BuildConfig;
 import com.ae.andriod.popularmovies.Model.Movie;
 
 import org.json.JSONArray;
@@ -25,7 +26,7 @@ public class FetchMovies {
 
 
     //key
-    private static final String API_KEY = "place your key here";
+    private static final String API_KEY = BuildConfig.Apikey;
 
     //Constants for URI
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
@@ -77,7 +78,7 @@ public class FetchMovies {
                         ENDPOINT);
             }
 
-            int bytesRead = 0;
+            int bytesRead;
             byte[] buffer = new byte[1024];
 
             while ((bytesRead = in.read(buffer)) > 0) {

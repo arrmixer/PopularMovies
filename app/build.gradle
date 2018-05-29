@@ -4,16 +4,24 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId 'com.ae.android.popularmovies'
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug{
+            buildConfigField 'String', "Apikey",
+                    PopularMoives_MovieDBKey
+            resValue 'string', "api_key", PopularMoives_MovieDBKey
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', "Apikey",
+                    PopularMoives_MovieDBKey
+            resValue 'string', "api_key", PopularMoives_MovieDBKey
         }
     }
     dataBinding {

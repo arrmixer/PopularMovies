@@ -3,7 +3,6 @@ package com.ae.andriod.popularmovies.View;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -18,19 +17,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Toast;
 
 
 import com.ae.andriod.popularmovies.Model.Movie;
 import com.ae.andriod.popularmovies.R;
-import com.ae.andriod.popularmovies.Util.FetchMovies;
+import com.ae.andriod.popularmovies.Util.FetchMoviesAysncTask;
+import com.ae.andriod.popularmovies.Util.MenuQuery;
 import com.ae.andriod.popularmovies.ViewModel.MovieViewModel;
 import com.ae.andriod.popularmovies.databinding.FragmentMoviesBinding;
 import com.ae.andriod.popularmovies.databinding.ListItemMovieBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MovieFragment extends Fragment {
 
@@ -106,8 +106,21 @@ public class MovieFragment extends Fragment {
             mMovieList = savedInstanceState.getParcelableArrayList(EXTRA_MOVIE_LIST);
             query = savedInstanceState.getString(EXTRA_QUERY);
         } else {
-            new FetchMoviesTask().execute(POPULAR);
+
+
+            FetchMoviesAysncTask movieAysnc = new FetchMoviesAysncTask();
+            if (MenuQuery.getPrefSearchQuery(getActivity()) != null) {
+                query = MenuQuery.getPrefSearchQuery(getActivity());
+            } else {
+                query = POPULAR;
+            }
+
+            movieAysnc.execute(query);
+
+            getMovieList(movieAysnc);
+
         }
+
 
         /*required to let the fragmentmanager know to recieve the callback
          * from onCreateOptionsMenu method. If set to false the menu resource
@@ -223,37 +236,26 @@ public class MovieFragment extends Fragment {
         }
     }
 
-    private class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
-
-
-        @Override
-        protected List<Movie> doInBackground(String... strings) {
-
-            //make query point to String parameter
-            query = strings[0];
-
-//            Log.i("Activity", FetchMovies.parseSandwichJson(strings[0]).toString());
-//            Log.i("Activity", "" + FetchMovies.parseSandwichJson(strings[0]).size());
-            return FetchMovies.parseSandwichJson(strings[0]);
-
-
-        }
-
-
-        @Override
-        protected void onPostExecute(List<Movie> movies) {
-            mMovieList = movies;
-
-            setupAdapter();
-
-        }
-    }
 
     //make sure data is in before assigning to adapter
     private void setupAdapter() {
         if (isAdded() && mMovieList != null) {
-            mFragmentMoviesBinding.recyclerView.setAdapter(new MovieAdapter(mMovieList));
+            MovieAdapter movieAdapter = new MovieAdapter(mMovieList);
+            mFragmentMoviesBinding.recyclerView.setAdapter(movieAdapter);
+            movieAdapter.notifyDataSetChanged();
         }
+    }
+
+    private List<Movie> getMovieList(FetchMoviesAysncTask fetchMovies) {
+        try {
+            mMovieList = fetchMovies.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
+
+        return mMovieList;
     }
 
     @Override
@@ -277,17 +279,27 @@ public class MovieFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.highest_rated:
                 if (!query.equals(TOP_RATED)) {
-                    new FetchMoviesTask().execute(TOP_RATED);
+                    FetchMoviesAysncTask moviesTaskTopRated = new FetchMoviesAysncTask();
+                    query = TOP_RATED;
+                    MenuQuery.setPrefSearchQuery(getActivity(), query);
+                    moviesTaskTopRated.execute(TOP_RATED);
+                    getMovieList(moviesTaskTopRated);
+                    setupAdapter();
                 } else {
-                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
                 }
-                
+
                 return true;
             case R.id.most_popular:
                 if (!query.equals(POPULAR)) {
-                    new FetchMoviesTask().execute(POPULAR);
+                    FetchMoviesAysncTask moviesTaskPopular = new FetchMoviesAysncTask();
+                    query = POPULAR;
+                    MenuQuery.setPrefSearchQuery(getActivity(), query);
+                    moviesTaskPopular.execute(POPULAR);
+                    getMovieList(moviesTaskPopular);
+                    setupAdapter();
                 } else {
-                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
                 }
 
                 return true;

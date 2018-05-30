@@ -7,6 +7,7 @@ import android.util.Log;
 
 
 import com.ae.andriod.popularmovies.R;
+import com.ae.andriod.popularmovies.Util.MenuQuery;
 
 
 public class MainActivity extends SingleFragmentActivity {

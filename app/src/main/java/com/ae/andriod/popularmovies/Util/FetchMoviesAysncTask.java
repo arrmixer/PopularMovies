@@ -21,9 +21,10 @@ public class FetchMoviesAysncTask extends AsyncTask<String, Void, List<Movie>> {
         //make query point to String parameter
         query = strings[0];
 
-//            Log.i("Activity", FetchMovies.parseSandwichJson(strings[0]).toString());
-//            Log.i("Activity", "" + FetchMovies.parseSandwichJson(strings[0]).size());
-        return FetchMovies.parseSandwichJson(strings[0]);
+
+//            Log.i("Activity", FetchMovies.parseMoviesJson(strings[0]).toString());
+//            Log.i("Activity", "" + FetchMovies.parseMoviesJson(strings[0]).size());
+        return FetchMovies.parseMoviesJson(strings[0]);
 
 
     }
@@ -32,7 +33,6 @@ public class FetchMoviesAysncTask extends AsyncTask<String, Void, List<Movie>> {
     @Override
     protected void onPostExecute(List<Movie> movies) {
         mMovieList = movies;
-
 
 
     }

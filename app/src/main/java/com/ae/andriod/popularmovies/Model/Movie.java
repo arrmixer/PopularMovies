@@ -4,6 +4,8 @@ package com.ae.andriod.popularmovies.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 
 
 /*Model for the Movie object(POJO). It should populate on
@@ -19,6 +21,12 @@ public class Movie implements Parcelable{
    private double mUserRating;
    private String mReleaseDate;
    private String mDescription;
+
+   //to be added after initial construction
+   private int runtime;
+   private List<String> authors;
+   private List< String> reviews;
+   private List<String> youtubeKeys;
 
 
     /*Stores image path of poster to be
@@ -84,6 +92,44 @@ public class Movie implements Parcelable{
 
     public void setDescription(String description) {
         mDescription = description;
+    }
+
+
+   /*Runtime and Reviews is not set in Parcel at this time.
+   * It is not part of initial build in the Main page. If the
+   * user selects a movie, both are added to the model
+   * afterwards in Detail page*/
+    public int getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(int runtime) {
+        this.runtime = runtime;
+    }
+
+    public List<String> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<String> authors) {
+        this.authors = authors;
+    }
+
+    /*Using the JSON as my glue for my authors and reviews*/
+    public List<String> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<String> reviews) {
+        this.reviews = reviews;
+    }
+
+    public List<String> getYoutubeKeys() {
+        return youtubeKeys;
+    }
+
+    public void setYoutubeKeys(List<String> youtubeKeys) {
+        this.youtubeKeys = youtubeKeys;
     }
 
     /*Method used to create URL to retrieve photo jpg*/

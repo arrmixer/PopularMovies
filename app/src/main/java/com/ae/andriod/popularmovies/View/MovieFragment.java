@@ -177,7 +177,7 @@ public class MovieFragment extends Fragment {
 
         }
 
-        void bindImageItem(Movie movie) {
+        private void bindImageItem(Movie movie) {
             mMovie = movie;
             /*add the movie object to the ViewModel to display
              * the properties */
@@ -227,7 +227,6 @@ public class MovieFragment extends Fragment {
 //            Log.i("Activity", "" + movie.getImage(movie));
             holder.bindImageItem(movie);
 
-
         }
 
         @Override
@@ -246,6 +245,12 @@ public class MovieFragment extends Fragment {
         }
     }
 
+    /*Method retrieves the movie list result from the AsyncTask
+    * @param instance of FetchMoviesAsyncTask
+    *
+    * @return movie list
+    *
+    * */
     private List<Movie> getMovieList(FetchMoviesAysncTask fetchMovies) {
         try {
             mMovieList = fetchMovies.get();

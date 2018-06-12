@@ -5,10 +5,15 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.widget.ImageView;
+
 import com.ae.andriod.popularmovies.Model.Movie;
 import com.ae.andriod.popularmovies.R;
 
 import com.squareup.picasso.Picasso;
+
+
+import java.util.List;
+
 
 public class MovieViewModel extends BaseObservable {
 
@@ -44,6 +49,24 @@ public class MovieViewModel extends BaseObservable {
     }
 
     @Bindable
+    public List<String> getAuthors() {return mMovie.getAuthors();}
+
+    @Bindable
+    public List<String> getMovieReviews() {
+        return mMovie.getReviews();
+    }
+
+    @Bindable
+    public List<String> getYouTubeKeys() {
+        return mMovie.getYoutubeKeys();
+    }
+
+    @Bindable
+    public int getRuntime() {
+        return mMovie.getRuntime();
+    }
+
+    @Bindable
     public String getDecription() {
         return mMovie.getDescription();
     }
@@ -54,7 +77,7 @@ public class MovieViewModel extends BaseObservable {
 
     @BindingAdapter({"imageUrl"})
     public static void loadImage(ImageView view, String url) {
-        Picasso.with(view.getContext())
+        Picasso.get()
                 .load(url)
                 .placeholder(R.drawable.ic_udacity)
                 .into(view);

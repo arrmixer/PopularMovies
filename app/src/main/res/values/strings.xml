@@ -11,5 +11,14 @@
     <string name="button_favorite">Mark as favorite</string>
     <string name="menu_toast">List already processed</string>
     <string name="movie_description">Lorem ipsum dolor sit amet, mea everti suscipiantur ex, similique assueverit in ius, vix te libris imperdiet definitionem. An vix mundi tritani scripserit. In tractatos sapientem definitiones est, dicam tacimates nam ut, in nec scripta oporteat disputationi. Eam in atomorum concludaturque, harum impedit pertinax has eu. Te denique scribentur mei, te tempor graecis nam. Nec te quod wisi senserit, ut mea clita eirmod tibique.</string>
+    <string name="trailers_title">Movie Clips:</string>
+    <string name="reviews_title">Reviews:</string>
+    <item name="movie_clips_recyclerview" type="id"/>
+    <item name="review_title" type="id"/>
+    <item name="masked" type="id"/>
+
+
 
 </resources>
+
+

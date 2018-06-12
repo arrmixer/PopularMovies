@@ -29,10 +29,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">start</item>
         <item name="android:background">@color/teal400</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingStart">20dp</item>
-        <item name="android:paddingTop">20dp</item>
+        <item name="android:paddingTop">10dp</item>
         <item name="android:textAlignment">textStart</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textSize">@dimen/text_size_title</item>
@@ -43,7 +43,7 @@
         <item name="android:textAlignment">textStart</item>
         <item name="android:layout_marginEnd">8dp</item>
         <item name="android:layout_marginStart">32dp</item>
-        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
         <item name="android:gravity">start</item>
         <item name="android:textSize">@dimen/text_size</item>
     </style>
@@ -72,7 +72,7 @@
     </style>
 
     <style name="Movie_Year" parent="TextMargin">
-        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginTop">10dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">@dimen/text_size_year</item>
     </style>
@@ -80,7 +80,7 @@
     <style name="Movie_Image_Detail">
         <item name="android:layout_width">150dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_marginStart">25dp</item>
         <item name="android:gravity">center</item>
         <item name="android:adjustViewBounds">true</item>

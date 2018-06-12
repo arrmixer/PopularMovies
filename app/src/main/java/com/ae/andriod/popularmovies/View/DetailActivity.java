@@ -23,7 +23,7 @@ public class DetailActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         Movie movie = getIntent().getParcelableExtra(EXTRA_MOVIE);
         List<Movie> movies = getIntent().getParcelableArrayListExtra(EXTRA_MOVIE_LIST);
-        return DetailFragment.newIntance(movie, movies);
+        return DetailFragment.newInstance(movie, movies);
     }
 
     @Override

@@ -60,7 +60,8 @@
                 android:id="@+id/movie_mark_favorite_button"
                 style="@style/Favorite_Button"
                 app:layout_constraintStart_toStartOf="@+id/movie_rating_text_view"
-                app:layout_constraintTop_toBottomOf="@+id/movie_rating_text_view" />
+                app:layout_constraintTop_toBottomOf="@+id/movie_rating_text_view"
+                tools:text="@string/button_favorite"/>
 
             <TextView
                 android:id="@+id/movie_description_text_view"

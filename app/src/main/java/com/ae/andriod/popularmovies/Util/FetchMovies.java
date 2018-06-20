@@ -71,6 +71,8 @@ public class FetchMovies {
         URL url = new URL(stringUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
+//        Log.i(TAG, "New Url: =======" + stringUrl);
+
         try {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -179,7 +181,7 @@ public class FetchMovies {
         StringBuilder sb = new StringBuilder();
         String string = sb.append(stringUrl).append(",").append(REVIEWS).toString();
 
-        Log.i(TAG, "New Url: =======" + string);
+//        Log.i(TAG, "New Url: =======" + string);
 
 
         URL url = new URL(string);
@@ -270,7 +272,6 @@ public class FetchMovies {
                 reviews.add(movieReview);
 //                Log.i(TAG,"New Author: ======= " + author);
 //                Log.i(TAG,"New Review: ======= " + movieReview);
-//                Log.i(TAG, "New Set: ======= " + reviews.keySet().toString());
             }
 
             movie.setAuthors(authors);

@@ -1,6 +1,8 @@
 package com.ae.andriod.popularmovies.View;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -22,7 +24,7 @@ import android.widget.Toast;
 
 import com.ae.andriod.popularmovies.Model.Movie;
 import com.ae.andriod.popularmovies.R;
-import com.ae.andriod.popularmovies.Util.FetchMoviesAysncTask;
+import com.ae.andriod.popularmovies.Util.FetchMoviesAsyncTask;
 import com.ae.andriod.popularmovies.Util.MenuQuery;
 import com.ae.andriod.popularmovies.ViewModel.MovieViewModel;
 import com.ae.andriod.popularmovies.databinding.FragmentMoviesBinding;
@@ -48,11 +50,13 @@ public class MovieFragment extends Fragment {
     //Constants for Search Queries from MovieDB
     private static final String POPULAR = "popular"; //for popular search
     private static final String TOP_RATED = "top_rated"; //for highest rated
+    public static final String FAVORITE = "favorties"; //for favorites
 
     /*placeholders for Movie and return Lists of Movies
      * per Category: Most Popular and Top-Rated*/
 
-    private List<Movie> mMovieList;
+    private List<Movie> mMovieList; //Movies from API
+    private List<Movie> mMovieDBList; //Movies from DB
 
     //Placeholder for String query parameter
     private String query;
@@ -60,6 +64,8 @@ public class MovieFragment extends Fragment {
     //instance of Data Binding class for Fragment
     private FragmentMoviesBinding mFragmentMoviesBinding;
 
+    //instance of ViewModel
+    private MovieViewModel mMovieViewModel;
 
     @Override
     public void onPause() {
@@ -99,16 +105,15 @@ public class MovieFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*does not destroy fragment*/
-//        setRetainInstance(true);
+        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         if (savedInstanceState != null) {
             mMovieList = savedInstanceState.getParcelableArrayList(EXTRA_MOVIE_LIST);
             query = savedInstanceState.getString(EXTRA_QUERY);
         } else {
 
+            FetchMoviesAsyncTask movieAysnc = new FetchMoviesAsyncTask();
 
-            FetchMoviesAysncTask movieAysnc = new FetchMoviesAysncTask();
             if (MenuQuery.getPrefSearchQuery(getActivity()) != null) {
                 query = MenuQuery.getPrefSearchQuery(getActivity());
             } else {
@@ -120,6 +125,28 @@ public class MovieFragment extends Fragment {
             getMovieList(movieAysnc);
 
         }
+
+        mMovieViewModel.getLiveData(mMovieList).observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d(TAG, "Movie List Changed noticed");
+                setupAdapter(movies);
+            }
+        });
+
+        mMovieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d(TAG, "Movies from favorites " + movies.size());
+                mMovieDBList = movies;
+                if(query.equals(FAVORITE)) {
+                    setupAdapter(mMovieDBList);
+                }
+
+            }
+        });
+
+
 
 
         /*required to let the fragmentmanager know to recieve the callback
@@ -137,15 +164,16 @@ public class MovieFragment extends Fragment {
          * via the DataBindingUtil class*/
 
         mFragmentMoviesBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
+        mFragmentMoviesBinding.setLifecycleOwner(this);
 
 
         //creating a gridlayout to display image buttons
         mFragmentMoviesBinding.recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
-        setupAdapter();
 
         /*Returning the root of the DataBinding class
          * since that is where the view resides*/
+
         return mFragmentMoviesBinding.getRoot();
 
 
@@ -153,10 +181,10 @@ public class MovieFragment extends Fragment {
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        //get instance of DataBinding classandroid:id="@+id/movie_Image"
+        //get instance of DataBinding class android:id="@+id/movie_Image"
         private final ListItemMovieBinding mListItemMovieBinding;
 
-        //placeholder for each movie object coming from the adpat
+        //placeholder for each movie object coming from the adaptor
         private Movie mMovie;
 
 
@@ -173,7 +201,8 @@ public class MovieFragment extends Fragment {
             itemView.setOnClickListener(this);
 
             //set the ViewModel object on ListItemMovieBinding
-            mListItemMovieBinding.setViewModel(new MovieViewModel());
+            mListItemMovieBinding.setViewModel(mMovieViewModel);
+
 
         }
 
@@ -181,7 +210,13 @@ public class MovieFragment extends Fragment {
             mMovie = movie;
             /*add the movie object to the ViewModel to display
              * the properties */
-            mListItemMovieBinding.getViewModel().setMovie(movie);
+            mMovieViewModel.setMovie(movie);
+            mMovieViewModel.getImageUrl().observe(getActivity(), new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    MovieViewModel.loadImage(mListItemMovieBinding.movieImage, s);
+                }
+            });
             mListItemMovieBinding.executePendingBindings();
         }
 
@@ -213,8 +248,10 @@ public class MovieFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             //inflate the view from the ListItemMovieBinding class
-            ListItemMovieBinding binding = DataBindingUtil
+            final ListItemMovieBinding binding = DataBindingUtil
                     .inflate(inflater, R.layout.list_item_movie, parent, false);
+
+            binding.setLifecycleOwner(getActivity());
 
 
             return new MovieHolder(binding);
@@ -224,8 +261,9 @@ public class MovieFragment extends Fragment {
         public void onBindViewHolder(@NonNull MovieHolder holder, int position) {
             //create a movie object from the list
             Movie movie = mMovies.get(position);
-//            Log.i("Activity", "" + movie.getImage(movie));
+            Log.d(TAG, "Check image......." + movie.getImage(movie));
             holder.bindImageItem(movie);
+
 
         }
 
@@ -237,21 +275,21 @@ public class MovieFragment extends Fragment {
 
 
     //make sure data is in before assigning to adapter
-    private void setupAdapter() {
+    private void setupAdapter(List<Movie> movies) {
         if (isAdded() && mMovieList != null) {
-            MovieAdapter movieAdapter = new MovieAdapter(mMovieList);
+            MovieAdapter movieAdapter = new MovieAdapter(movies);
             mFragmentMoviesBinding.recyclerView.setAdapter(movieAdapter);
             movieAdapter.notifyDataSetChanged();
         }
     }
 
     /*Method retrieves the movie list result from the AsyncTask
-    * @param instance of FetchMoviesAsyncTask
-    *
-    * @return movie list
-    *
-    * */
-    private List<Movie> getMovieList(FetchMoviesAysncTask fetchMovies) {
+     * @param instance of FetchMoviesAsyncTask
+     *
+     * @return movie list
+     *
+     * */
+    private List<Movie> getMovieList(FetchMoviesAsyncTask fetchMovies) {
         try {
             mMovieList = fetchMovies.get();
         } catch (ExecutionException e) {
@@ -284,12 +322,12 @@ public class MovieFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.highest_rated:
                 if (!query.equals(TOP_RATED)) {
-                    FetchMoviesAysncTask moviesTaskTopRated = new FetchMoviesAysncTask();
+                    FetchMoviesAsyncTask moviesTaskTopRated = new FetchMoviesAsyncTask();
                     query = TOP_RATED;
                     MenuQuery.setPrefSearchQuery(getActivity(), query);
                     moviesTaskTopRated.execute(TOP_RATED);
                     getMovieList(moviesTaskTopRated);
-                    setupAdapter();
+                    setupAdapter(mMovieList);
                 } else {
                     Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
                 }
@@ -297,16 +335,24 @@ public class MovieFragment extends Fragment {
                 return true;
             case R.id.most_popular:
                 if (!query.equals(POPULAR)) {
-                    FetchMoviesAysncTask moviesTaskPopular = new FetchMoviesAysncTask();
+                    FetchMoviesAsyncTask moviesTaskPopular = new FetchMoviesAsyncTask();
                     query = POPULAR;
                     MenuQuery.setPrefSearchQuery(getActivity(), query);
                     moviesTaskPopular.execute(POPULAR);
                     getMovieList(moviesTaskPopular);
-                    setupAdapter();
+                    setupAdapter(mMovieList);
                 } else {
                     Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
                 }
 
+                return true;
+            case R.id.favorties:
+                if (!query.equals(FAVORITE)) {
+                    query = FAVORITE;
+                    setupAdapter(mMovieDBList);
+                } else {
+                    Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

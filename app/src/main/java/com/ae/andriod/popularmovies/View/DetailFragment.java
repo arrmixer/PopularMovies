@@ -1,7 +1,11 @@
 package com.ae.andriod.popularmovies.View;
 
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.ae.andriod.popularmovies.Model.Movie;
+import com.ae.andriod.popularmovies.MovieClipAdapter;
+import com.ae.andriod.popularmovies.MovieReviewAdapter;
 import com.ae.andriod.popularmovies.R;
 import com.ae.andriod.popularmovies.Util.FetchMovieDetailAsyncTask;
 import com.ae.andriod.popularmovies.ViewModel.MovieViewModel;
@@ -30,15 +36,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static com.ae.andriod.popularmovies.Util.PackageCheck.isPackageInstalled;
 
-public class DetailFragment extends Fragment {
+
+public class DetailFragment extends Fragment implements MovieClipAdapter.ItemClickListener {
     //Constant for Logging
     private static final String TAG = DetailFragment.class.getSimpleName();
 
     //Constant keys for Intents and save Instance States
     private static final String EXTRA_MOVIE = "com.ae.andriod.popularmovies.movie";
     private static final String EXTRA_MOVIE_LIST = "com.ae.andriod.popularmovies.movie_list";
-    private static final String EXTRA_MOVIE_CLIP_LIST = "com.ae.andriod.popularmovies.movie_clip_list";
+    public static final String YOUTUBE = "com.google.android.youtube";
 
 
     //Constants for Detail Query and Video query from MovieDB
@@ -51,12 +59,16 @@ public class DetailFragment extends Fragment {
     RecyclerView recyclerViewMovieClips;
     RecyclerView recyclerViewMovieReviews;
 
+    //placeholders for both Adapters (movie clips and movie reviews)
+    private MovieClipAdapter mMovieClipAdapter;
+    private MovieReviewAdapter mMovieReviewAdapter;
+
     //placeholder for Movie object and ViewModel
     private Movie mMovie;
     private MovieViewModel mMovieViewModel;
-    private List<String> movieClips;
-    private List<String> authors;
-    private List<String> reviews;
+
+    private Movie m;
+
 
     /*Following of adding a static method to the Fragment Class
      * This method will put arguments in the Bundle and then
@@ -77,17 +89,13 @@ public class DetailFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(EXTRA_MOVIE, mMovie);
-
-//        RecyclerView mRecylerView = mFragmentMovieDetailBinding.recyclerViewClips;
-//        if(mRecylerView.getLayoutManager().onSaveInstanceState() != null){
-//            outState.putParcelable("test",mRecylerView.getLayoutManager().onSaveInstanceState() );
-//
-//        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
 
         if (savedInstanceState != null) {
@@ -100,6 +108,41 @@ public class DetailFragment extends Fragment {
             mMovie = getUpdatedMovie(movieDetailAsyncTask);
 
         }
+
+
+        mMovieViewModel.setMovie(mMovie);
+
+        mMovieViewModel.getMovieLiveData(mMovie).observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(@Nullable Movie movie) {
+                Log.d(TAG, "Movie Changed noticed");
+                mMovie = movie;
+                updateUI(mFragmentMovieDetailBinding, mMovie);
+                setupAdapter();
+
+            }
+        });
+
+        mMovieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d(TAG, "Movies from favorites " + movies.size());
+            }
+        });
+
+        mMovieViewModel.getMovieFromDB(mMovie.getMovieId()).observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(@Nullable Movie movie) {
+                if (movie != null && (movie.getMovieId() == mMovie.getMovieId())) {
+                    Log.d(TAG, "Movie is already in DB!!!!! ");
+
+                    mFragmentMovieDetailBinding.movieMarkFavoriteButton.setText(R.string.button_unfavorite);
+                } else {
+                    mFragmentMovieDetailBinding.movieMarkFavoriteButton.setText(R.string.button_favorite);
+                }
+
+            }
+        });
 
 
         returnResult();
@@ -117,18 +160,38 @@ public class DetailFragment extends Fragment {
         /*Using DataBinding class to inflate View into fragment
          * via the DataBindingUtil class*/
         mFragmentMovieDetailBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false);
+        mFragmentMovieDetailBinding.setLifecycleOwner(this);
 
         //setup RecyclerViews with a Linear Layout
         recyclerViewMovieClips = mFragmentMovieDetailBinding.movieClipsRecyclerview;
         recyclerViewMovieClips.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
         recyclerViewMovieReviews = mFragmentMovieDetailBinding.movieReviewsRecyclerview;
         recyclerViewMovieReviews.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
         //helper method to popular data onto view
         updateUI(mFragmentMovieDetailBinding, mMovie);
-
         setupAdapter();
+
+        mFragmentMovieDetailBinding.movieMarkFavoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(), "You clicked " + mMovie.getTitle(), Toast.LENGTH_SHORT).show();
+
+                if(mFragmentMovieDetailBinding.movieMarkFavoriteButton.getText().toString().equals(getResources().getString(R.string.button_favorite))){
+                    mMovieViewModel.insertMovieDB(mMovie);
+                }else{
+                    mMovieViewModel.deleteMovieDB(mMovie);
+                }
+
+            }
+        });
+
+
+
+
 
 
         /*return the root of the databind class which is
@@ -152,9 +215,11 @@ public class DetailFragment extends Fragment {
         /*create instance of ViewModel, set it to the DataBinding Class
          * ,and then add the movie object pass from the activity into
          * the ViewModel*/
-        mMovieViewModel = new MovieViewModel();
+
+
         fragmentMovieDetailBinding.setViewModel(mMovieViewModel);
-        fragmentMovieDetailBinding.getViewModel().setMovie(movie);
+        mMovieViewModel.setMovie(movie);
+
 
         //placeholders for String data
         String rating = Double.toString(mMovieViewModel.getUserRating()) + "/10";
@@ -165,7 +230,7 @@ public class DetailFragment extends Fragment {
         fragmentMovieDetailBinding.movieTitleTextView.setText(mMovieViewModel.getTitle());
         fragmentMovieDetailBinding.movieRatingTextView.setText(rating);
         fragmentMovieDetailBinding.movieYearTextView.setText(year);
-        fragmentMovieDetailBinding.movieDescriptionTextView.setText(mMovieViewModel.getDecription());
+        fragmentMovieDetailBinding.movieDescriptionTextView.setText(mMovieViewModel.getDescription());
         fragmentMovieDetailBinding.movieDurationTextView.setText(runtime);
 
 
@@ -177,14 +242,16 @@ public class DetailFragment extends Fragment {
         if (isAdded() && mMovie.getYoutubeKeys() != null && mMovie.getReviews() != null) {
 
             //setup adapters
-            MovieClipAdapter movieClipAdapter = new MovieClipAdapter();
-            recyclerViewMovieClips.setAdapter(movieClipAdapter);
 
-            MovieReviewAdapter movieReviewAdapter = new MovieReviewAdapter();
-            recyclerViewMovieReviews.setAdapter(movieReviewAdapter);
+            mMovieClipAdapter = new MovieClipAdapter(this, getContext(), mMovieViewModel);
 
-            movieClipAdapter.notifyDataSetChanged();
-            movieReviewAdapter.notifyDataSetChanged();
+            recyclerViewMovieClips.setAdapter(mMovieClipAdapter);
+
+            mMovieReviewAdapter = new MovieReviewAdapter(getContext(), mMovieViewModel);
+            recyclerViewMovieReviews.setAdapter(mMovieReviewAdapter);
+
+            mMovieClipAdapter.notifyDataSetChanged();
+            mMovieReviewAdapter.notifyDataSetChanged();
         }
     }
 
@@ -215,136 +282,18 @@ public class DetailFragment extends Fragment {
         getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
+    @Override
+    public void onItemClickListener(int itemId) {
 
-    //RecyclerViews one for the Movie Clips and one for the Reviews
-    private class MovieClipHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + mMovieViewModel.getYouTubeKeys().get(itemId)));
 
-
-        private final MovieClipItemBinding mMovieClipItemBinding;
-
-
-        private MovieClipHolder(MovieClipItemBinding binding) {
-            super(binding.getRoot());
-
-            //assign instance of ListItemMovieDetailBinding to parameter
-            mMovieClipItemBinding = binding;
-
-            //set click event to each itemView
-            itemView.setOnClickListener(this);
-
-            //set the same ViewModel object on mListItemMovieDetailBinding
-            mMovieClipItemBinding.setViewModel(mMovieViewModel);
-
-        }
-
-        private void bindMovieClip(int position) {
-
-            String message = "Movie Clip " + (position + 1);
-            mMovieClipItemBinding.textView.setText(message);
-        }
-
-        @Override
-        public void onClick(View view) {
-
-            int position = getAdapterPosition();
-            Toast.makeText(getContext(), "Clicked" + mMovieViewModel.getYouTubeKeys() + " " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-
-
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + mMovieViewModel.getYouTubeKeys().get(getAdapterPosition())));
+        String youtubePackage = YOUTUBE;
+        if (isPackageInstalled(youtubePackage, getContext().getPackageManager())) {
             startActivity(intent);
-
+        } else {
+            Toast.makeText(getContext(), "Need to install YouTube.", Toast.LENGTH_SHORT).show();
         }
+
     }
-
-    private class MovieClipAdapter extends RecyclerView.Adapter<MovieClipHolder> {
-//
-//        private List<String> movieClips;
-//
-//        public MovieClipAdapter(List<String> movieClips) {
-//            this.movieClips = movieClips;
-//        }
-
-        @NonNull
-        @Override
-        public MovieClipHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            //get inflater from container Activity
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-            //inflate the view from the ListItemMovieBinding class
-            MovieClipItemBinding binding = DataBindingUtil
-                    .inflate(inflater, R.layout.movie_clip_item, parent, false);
-
-
-            return new MovieClipHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull MovieClipHolder holder, int position) {
-            holder.bindMovieClip(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mMovieViewModel.getYouTubeKeys().size();
-        }
-    }
-
-    private class MovieReviewHolder extends RecyclerView.ViewHolder {
-
-        //get instance of databinding class
-        private final ReviewsBinding mReviewsBinding;
-
-        public MovieReviewHolder(ReviewsBinding binding) {
-            super(binding.getRoot());
-
-            //assign instance of mReviewBindng to parameter
-            mReviewsBinding = binding;
-
-            //set the same ViewModel object on mReviewsBinding
-            mReviewsBinding.setViewModel(mMovieViewModel);
-        }
-
-
-        private void bindReviews(int position) {
-
-            if(mMovieViewModel.getAuthors().size() > 0){
-                mReviewsBinding.author.setText(mMovieViewModel.getAuthors().get(position));
-                mReviewsBinding.authorReview.setText(mMovieViewModel.getMovieReviews().get(position));
-            }else{
-                mReviewsBinding.author.setText("No reviews at this time.");
-            }
-
-
-        }
-    }
-
-    private class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewHolder> {
-
-        @NonNull
-        @Override
-        public MovieReviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            //get inflater from container Activity
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-            //inflate the view from the ReviewsBinding class
-            ReviewsBinding binding = DataBindingUtil
-                    .inflate(inflater, R.layout.reviews, parent, false);
-
-
-            return new MovieReviewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull MovieReviewHolder holder, int position) {
-            holder.bindReviews(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            //could have used either List: authors or reviews
-            return mMovieViewModel.getMovieReviews().size();
-        }
-    }
-
 
 }

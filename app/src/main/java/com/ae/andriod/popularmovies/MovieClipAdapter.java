@@ -1,34 +1,28 @@
 package com.ae.andriod.popularmovies;
 
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.ViewModel;
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.ae.andriod.popularmovies.View.DetailFragment;
+
 import com.ae.andriod.popularmovies.ViewModel.MovieViewModel;
 import com.ae.andriod.popularmovies.databinding.MovieClipItemBinding;
-
-import java.util.List;
 
 
 public class MovieClipAdapter extends RecyclerView.Adapter<MovieClipAdapter.MovieClipHolder> {
 
-//     Member variable to handle item clicks
+    //     Member variable to handle item clicks
     final private ItemClickListener mItemClickListener;
 
-//    Class variables for the List that holds MovieViewModel and the Context
-    private Context mContext;
-    private MovieViewModel mMovieViewModel;
+    //    Class variables for the List that holds MovieViewModel and the Context
+    private final Context mContext;
+    private final MovieViewModel mMovieViewModel;
 
     public MovieClipAdapter(ItemClickListener itemClickListener, Context context, MovieViewModel movieViewModel) {
         mItemClickListener = itemClickListener;

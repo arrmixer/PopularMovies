@@ -2,7 +2,6 @@
     <string name="app_name">PopularMovies</string>
     <string name="movie_title">Movie Title</string>
     <string name="most_popular">Most Popular</string>
-    <string name="most_recent">Most Recent</string>
     <string name="highest_rated">Highest Rated</string>
     <string name="movie_detail">MovieDetail</string>
     <string name="duration">120min</string>
@@ -14,8 +13,7 @@
     <string name="movie_description">Lorem ipsum dolor sit amet, mea everti suscipiantur ex, similique assueverit in ius, vix te libris imperdiet definitionem. An vix mundi tritani scripserit. In tractatos sapientem definitiones est, dicam tacimates nam ut, in nec scripta oporteat disputationi. Eam in atomorum concludaturque, harum impedit pertinax has eu. Te denique scribentur mei, te tempor graecis nam. Nec te quod wisi senserit, ut mea clita eirmod tibique.</string>
     <string name="trailers_title">Movie Clips:</string>
     <string name="reviews_title">Reviews:</string>
-    <string name="network_error">No Network Connection</string>
-    <string name="favorites">favorites</string>
+    <string name="favorites">Favorites</string>
     <item name="movie_clips_recyclerview" type="id"/>
     <item name="review_title" type="id"/>
     <item name="masked" type="id"/>

@@ -4,7 +4,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ae.andriod.popularmovies.Model.Movie;
+import com.ae.andriod.popularmovies.View.MovieFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FetchMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>> {
@@ -24,7 +26,12 @@ public class FetchMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>> {
         //make query point to String parameter
         query = strings[0];
 
+        //workaround if query happens to be for the favorites list
+        if(query.equals(MovieFragment.FAVORITE)){
+            mMovieList = new ArrayList<>();
 
+            return mMovieList;
+        }
             Log.d(TAG, FetchMovies.parseMoviesJson(strings[0]).toString());
             Log.d(TAG, "" + FetchMovies.parseMoviesJson(strings[0]).size());
         return FetchMovies.parseMoviesJson(strings[0]);

@@ -112,7 +112,7 @@ public class MovieFragment extends Fragment {
             query = savedInstanceState.getString(EXTRA_QUERY);
         } else {
 
-            FetchMoviesAsyncTask movieAysnc = new FetchMoviesAsyncTask();
+            FetchMoviesAsyncTask movieAsync = new FetchMoviesAsyncTask();
 
             if (MenuQuery.getPrefSearchQuery(getActivity()) != null) {
                 query = MenuQuery.getPrefSearchQuery(getActivity());
@@ -120,9 +120,8 @@ public class MovieFragment extends Fragment {
                 query = POPULAR;
             }
 
-            movieAysnc.execute(query);
-
-            getMovieList(movieAysnc);
+            movieAsync.execute(query);
+            getMovieList(movieAsync);
 
         }
 
@@ -134,19 +133,18 @@ public class MovieFragment extends Fragment {
             }
         });
 
+
         mMovieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
             @Override
-            public void onChanged(@Nullable List<Movie> movies) {
+            public void onChanged(@Nullable final List<Movie> movies) {
                 Log.d(TAG, "Movies from favorites " + movies.size());
                 mMovieDBList = movies;
-                if(query.equals(FAVORITE)) {
+                if (query.equals(FAVORITE)) {
                     setupAdapter(mMovieDBList);
                 }
 
             }
         });
-
-
 
 
         /*required to let the fragmentmanager know to recieve the callback
@@ -289,7 +287,7 @@ public class MovieFragment extends Fragment {
      * @return movie list
      *
      * */
-    private List<Movie> getMovieList(FetchMoviesAsyncTask fetchMovies) {
+    private void getMovieList(FetchMoviesAsyncTask fetchMovies) {
         try {
             mMovieList = fetchMovies.get();
         } catch (ExecutionException e) {
@@ -298,7 +296,6 @@ public class MovieFragment extends Fragment {
             ie.printStackTrace();
         }
 
-        return mMovieList;
     }
 
     @Override
@@ -349,7 +346,11 @@ public class MovieFragment extends Fragment {
             case R.id.favorties:
                 if (!query.equals(FAVORITE)) {
                     query = FAVORITE;
+                    MenuQuery.setPrefSearchQuery(getActivity(), query);
                     setupAdapter(mMovieDBList);
+                    if (mMovieDBList.isEmpty()) {
+                        Toast.makeText(getActivity(), "Your Favorite List is Empty.", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(getActivity(), R.string.menu_toast, Toast.LENGTH_SHORT).show();
                 }

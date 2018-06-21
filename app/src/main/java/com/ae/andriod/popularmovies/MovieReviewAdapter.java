@@ -13,9 +13,9 @@ import com.ae.andriod.popularmovies.databinding.ReviewsBinding;
 
 public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.MovieReviewHolder> {
 
-//    Class variables for the List that holds MovieViewModel and the Context
-    private Context mContext;
-    private MovieViewModel mMovieViewModel;
+    //    Class variables for the List that holds MovieViewModel and the Context
+    private final Context mContext;
+    private final MovieViewModel mMovieViewModel;
 
     public MovieReviewAdapter(Context context, MovieViewModel movieViewModel) {
         mContext = context;
@@ -52,7 +52,7 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
         //get instance of databinding class
         private final ReviewsBinding mReviewsBinding;
 
-        public MovieReviewHolder(ReviewsBinding binding) {
+        MovieReviewHolder(ReviewsBinding binding) {
             super(binding.getRoot());
 
             //assign instance of mReviewBindng to parameter
@@ -65,13 +65,8 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
 
         private void bindReviews(int position) {
 
-            if (!mMovieViewModel.getAuthors().isEmpty()) {
-                mReviewsBinding.author.setText(mMovieViewModel.getAuthors().get(position));
-                mReviewsBinding.authorReview.setText(mMovieViewModel.getMovieReviews().get(position));
-            } else {
-                mReviewsBinding.author.setText("No reviews at this time.");
-            }
-
+            mReviewsBinding.author.setText(mMovieViewModel.getAuthors().get(position));
+            mReviewsBinding.authorReview.setText(mMovieViewModel.getMovieReviews().get(position));
 
         }
     }

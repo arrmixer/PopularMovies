@@ -17,12 +17,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 
 /*Util class used to open HTTP connection and Parse
  * the JSON data*/
-public class FetchMovies {
+class FetchMovies {
 
     private static final String TAG = FetchMovies.class.getSimpleName();
 

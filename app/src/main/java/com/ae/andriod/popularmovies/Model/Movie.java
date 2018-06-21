@@ -1,17 +1,14 @@
 package com.ae.andriod.popularmovies.Model;
 
 
-import android.arch.lifecycle.LiveData;
+
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
-import com.ae.andriod.popularmovies.database.Converter;
 
 import java.util.List;
 
@@ -178,16 +175,16 @@ public class Movie implements Parcelable {
         return sb.toString();
     }
 
-//    @Override
-//    public String toString() {
-//        return "Movie{" +
-//                "movieId=" + movieId +
-//                ", title='" + title + '\'' +
-//                ", userRating=" + userRating +
-//                ", releaseDate='" + releaseDate + '\'' +
-//                ", description='" + description + '\'' +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "movieId=" + movieId +
+                ", title='" + title + '\'' +
+                ", userRating=" + userRating +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 
     /*Parcel section*/
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

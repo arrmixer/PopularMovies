@@ -1,11 +1,9 @@
 package com.ae.andriod.popularmovies.View;
 
 import android.app.Activity;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,8 +26,6 @@ import com.ae.andriod.popularmovies.R;
 import com.ae.andriod.popularmovies.Util.FetchMovieDetailAsyncTask;
 import com.ae.andriod.popularmovies.ViewModel.MovieViewModel;
 import com.ae.andriod.popularmovies.databinding.FragmentMovieDetailBinding;
-import com.ae.andriod.popularmovies.databinding.MovieClipItemBinding;
-import com.ae.andriod.popularmovies.databinding.ReviewsBinding;
 
 
 import java.util.ArrayList;
@@ -46,7 +42,7 @@ public class DetailFragment extends Fragment implements MovieClipAdapter.ItemCli
     //Constant keys for Intents and save Instance States
     private static final String EXTRA_MOVIE = "com.ae.andriod.popularmovies.movie";
     private static final String EXTRA_MOVIE_LIST = "com.ae.andriod.popularmovies.movie_list";
-    public static final String YOUTUBE = "com.google.android.youtube";
+    private static final String YOUTUBE = "com.google.android.youtube";
 
 
     //Constants for Detail Query and Video query from MovieDB
@@ -56,8 +52,8 @@ public class DetailFragment extends Fragment implements MovieClipAdapter.ItemCli
     private FragmentMovieDetailBinding mFragmentMovieDetailBinding;
 
     //placeholders for both recycler views (movie clips and movie reviews)
-    RecyclerView recyclerViewMovieClips;
-    RecyclerView recyclerViewMovieReviews;
+    private RecyclerView recyclerViewMovieClips;
+    private RecyclerView recyclerViewMovieReviews;
 
     //placeholders for both Adapters (movie clips and movie reviews)
     private MovieClipAdapter mMovieClipAdapter;
@@ -106,7 +102,6 @@ public class DetailFragment extends Fragment implements MovieClipAdapter.ItemCli
             FetchMovieDetailAsyncTask movieDetailAsyncTask = new FetchMovieDetailAsyncTask();
             movieDetailAsyncTask.execute(mMovie);
             mMovie = getUpdatedMovie(movieDetailAsyncTask);
-
         }
 
 
@@ -180,9 +175,9 @@ public class DetailFragment extends Fragment implements MovieClipAdapter.ItemCli
             public void onClick(View view) {
                 Toast.makeText(view.getContext(), "You clicked " + mMovie.getTitle(), Toast.LENGTH_SHORT).show();
 
-                if(mFragmentMovieDetailBinding.movieMarkFavoriteButton.getText().toString().equals(getResources().getString(R.string.button_favorite))){
+                if (mFragmentMovieDetailBinding.movieMarkFavoriteButton.getText().toString().equals(getResources().getString(R.string.button_favorite))) {
                     mMovieViewModel.insertMovieDB(mMovie);
-                }else{
+                } else {
                     mMovieViewModel.deleteMovieDB(mMovie);
                 }
 
@@ -287,8 +282,8 @@ public class DetailFragment extends Fragment implements MovieClipAdapter.ItemCli
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + mMovieViewModel.getYouTubeKeys().get(itemId)));
 
-        String youtubePackage = YOUTUBE;
-        if (isPackageInstalled(youtubePackage, getContext().getPackageManager())) {
+
+        if (isPackageInstalled(YOUTUBE, getContext().getPackageManager())) {
             startActivity(intent);
         } else {
             Toast.makeText(getContext(), "Need to install YouTube.", Toast.LENGTH_SHORT).show();

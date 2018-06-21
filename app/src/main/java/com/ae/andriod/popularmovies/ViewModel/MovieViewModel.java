@@ -26,10 +26,10 @@ public class MovieViewModel extends AndroidViewModel {
 
     private Movie mMovie;
 
-    private MutableLiveData<List<Movie>> mLiveData;
-    private MutableLiveData<Movie> mMovieLiveData;
+    private final MutableLiveData<List<Movie>> mLiveData;
+    private final MutableLiveData<Movie> mMovieLiveData;
 
-    private MovieRepository mMovieRepository;
+    private final MovieRepository mMovieRepository;
 
     public MovieViewModel(@NonNull Application application) {
         super(application);

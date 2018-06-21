@@ -3,7 +3,6 @@ package com.ae.andriod.popularmovies;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.ae.andriod.popularmovies.Model.Movie;
 import com.ae.andriod.popularmovies.database.AppDatabase;
@@ -16,11 +15,11 @@ public class MovieRepository {
 
     public static final String TAG = MovieRepository.class.getSimpleName();
 
-    private MovieDao mMovieDao;
-    private LiveData<List<Movie>> mAllFavoriteMovies;
+    private final MovieDao mMovieDao;
+    private final LiveData<List<Movie>> mAllFavoriteMovies;
     private LiveData<Movie> mMovieLiveData;
 
-    public MovieRepository(Application application){
+    public MovieRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         mMovieDao = db.mMovieDao();
         mAllFavoriteMovies = db.mMovieDao().loadAllMovies();
@@ -31,16 +30,16 @@ public class MovieRepository {
         return mAllFavoriteMovies;
     }
 
-    public void insertMovieDB (Movie movie) {
+    public void insertMovieDB(Movie movie) {
 
         new insertAsyncTask(mMovieDao).execute(movie);
     }
 
-    public void deleteMovieDB(Movie movie){
+    public void deleteMovieDB(Movie movie) {
         new deleteAsyncTask(mMovieDao).execute(movie);
     }
 
-    public LiveData<Movie> getMovieFromDB(int movieId){
+    public LiveData<Movie> getMovieFromDB(int movieId) {
 
         return mMovieDao.loadMovieById(movieId);
     }
@@ -50,7 +49,7 @@ public class MovieRepository {
 
     private static class insertAsyncTask extends AsyncTask<Movie, Void, Void> {
 
-        private MovieDao mAsyncMovieDao;
+        private final MovieDao mAsyncMovieDao;
 
         insertAsyncTask(MovieDao dao) {
             mAsyncMovieDao = dao;
@@ -66,7 +65,7 @@ public class MovieRepository {
 
     private static class deleteAsyncTask extends AsyncTask<Movie, Void, Void> {
 
-        private MovieDao mAsyncMovieDao;
+        private final MovieDao mAsyncMovieDao;
 
         deleteAsyncTask(MovieDao dao) {
             mAsyncMovieDao = dao;

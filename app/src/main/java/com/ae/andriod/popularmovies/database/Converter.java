@@ -2,17 +2,16 @@ package com.ae.andriod.popularmovies.database;
 
 import android.arch.persistence.room.TypeConverter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Converter {
+class Converter {
 
 
     @TypeConverter
     public static List<String> toList(String s) {
 
-        List<String> strings = new ArrayList<>();
+        List<String> strings;
 
         String[] array = s.split("......LL");
 
@@ -30,7 +29,8 @@ public class Converter {
                 sb.append(s);
                 break;
             }
-            sb.append(s + "......LL");
+            sb.append(s);
+            sb.append("......LL");
         }
 
 

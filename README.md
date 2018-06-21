@@ -27,6 +27,18 @@ https://developer.android.com/topic/libraries/data-binding/binding-adapters
 Http-
 https://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
 
+For stage two I had to create a "Favorties" list and persist the data unto a DB. I decided t
+o use Room with ViewModel and LiveData. Besides Learning from Lesson 12: Android Architecture Components I used the following: 
+
+LiveData-
+
+https://developer.android.com/topic/libraries/architecture/livedata#the_advantages_of_using_livedata
+
+https://android.jlelse.eu/android-architecture-components-livedata-1ce4ab3c0466
+
+Room/ViewModel-
+
+https://codelabs.developers.google.com/codelabs/android-room-with-a-view/index.html?index=..%2F..%2Findex#0
 
 
 

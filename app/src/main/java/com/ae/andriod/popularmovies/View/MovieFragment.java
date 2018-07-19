@@ -3,6 +3,7 @@ package com.ae.andriod.popularmovies.View;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -41,10 +42,10 @@ public class MovieFragment extends Fragment {
 
 
     //Constant keys for Intents and save Instance States
-    private static final String EXTRA_QUERY = "com.ae.andriod.popularmovies.movie.query";
-    private static final String EXTRA_MOVIE = "com.ae.andriod.popularmovies.movie";
-    private static final String EXTRA_MOVIE_LIST = "com.ae.andriod.popularmovies.movie_list";
-    private static final int REQUEST_MOVIE_LIST = 101;
+    protected static final String EXTRA_QUERY = "com.ae.andriod.popularmovies.movie.query";
+    protected static final String EXTRA_MOVIE = "com.ae.andriod.popularmovies.movie";
+    protected static final String EXTRA_MOVIE_LIST = "com.ae.andriod.popularmovies.movie_list";
+    protected static final int REQUEST_MOVIE_LIST = 101;
 
 
     //Constants for Search Queries from MovieDB
@@ -66,6 +67,22 @@ public class MovieFragment extends Fragment {
 
     //instance of ViewModel
     private MovieViewModel mMovieViewModel;
+
+    //instance of Callback
+    private Callbacks mCallbacks;
+
+    //Interface for hosting activities
+    public interface Callbacks {
+        void onMovieSelected(Movie movie, List<Movie> movies);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        //must implement interface on MainActivity
+        //because cast is unchecked
+        mCallbacks = (Callbacks) context;
+    }
 
     @Override
     public void onPause() {
@@ -100,6 +117,11 @@ public class MovieFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -224,10 +246,8 @@ public class MovieFragment extends Fragment {
 //            Toast.makeText(view.getContext(), "clicked!", Toast.LENGTH_LONG).show();
 //            Log.i(TAG, "clicked" + mMovie.getTitle() + " " + mMovie.getImage(mMovie));
 
-            Intent i = new Intent(view.getContext(), DetailActivity.class);
-            i.putParcelableArrayListExtra(EXTRA_MOVIE_LIST, (ArrayList<? extends Parcelable>) mMovieList);
-            i.putExtra(EXTRA_MOVIE, mMovie);
-            startActivityForResult(i, REQUEST_MOVIE_LIST);
+            mCallbacks.onMovieSelected(mMovie, mMovieList);
+
         }
     }
 
